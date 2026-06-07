@@ -7,7 +7,7 @@
     "dev": "nodemon server.js",
     "build": "echo 'No build required'"
   },
-  "dependencies": {
+  "devDependencies": {
     "express": "^4.19.2",
     "cors": "^2.8.5"
   }
