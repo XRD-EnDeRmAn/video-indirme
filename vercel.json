@@ -1,7 +1,13 @@
 {
-  "outputDirectory": ".",
-  "functions": {
-    "api/download.js": { "maxDuration": 60 },
-    "api/info.js": { "maxDuration": 10 }
-  }
+  "builds": [
+    {
+      "src": "api/download.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/info.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "outputDirectory": "."
 }
