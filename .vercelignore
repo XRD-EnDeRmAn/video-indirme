@@ -4,5 +4,3 @@ yt-dlp.exe
 yt-dlp
 yt-dlp_macos
 *.log
-package-lock.json
-package.json
