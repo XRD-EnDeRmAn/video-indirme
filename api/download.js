@@ -1,15 +1,7 @@
 // api/download.js - Vercel Serverless Function
 const { spawn } = require('child_process');
 const { ensureYtDlp } = require('./_ytdlp');
-
-// ffmpeg-static bundles a pre-compiled ffmpeg binary for Linux/Windows/Mac
-let ffmpegPath = null;
-try {
-    ffmpegPath = require('ffmpeg-static');
-    console.log('ffmpeg bulundu:', ffmpegPath);
-} catch (e) {
-    console.warn('ffmpeg-static bulunamadı, MP3 dönüşümü devre dışı.');
-}
+const { ensureFfmpeg } = require('./_ffmpeg');
 
 module.exports = async (req, res) => {
     const { url, format, quality, title } = req.query;
@@ -20,6 +12,7 @@ module.exports = async (req, res) => {
 
     try {
         const ytdlpPath = await ensureYtDlp();
+        const ffmpegPath = format === 'mp3' ? await ensureFfmpeg() : null;
 
         const safeTitle = (title || `download_${Date.now()}`).replace(/[<>:"/\\|?*\r\n]+/g, '_').trim();
         const encodedTitle = encodeURIComponent(safeTitle);
@@ -28,7 +21,7 @@ module.exports = async (req, res) => {
 
         res.setHeader('Content-Disposition', `attachment; filename="${asciiTitle}.${ext}"; filename*=UTF-8''${encodedTitle}.${ext}`);
         res.setHeader('Content-Type', format === 'mp3' ? 'audio/mpeg' : 'video/mp4');
-        res.flushHeaders(); // Tarayıcı indirme kutusunu hemen göstersin
+        res.flushHeaders();
 
         const baseFlags = [
             '--no-playlist',
@@ -46,7 +39,7 @@ module.exports = async (req, res) => {
                 '-i', 'pipe:0',
                 '-f', 'mp3',
                 '-ab', '192000',
-                '-vn',         // video stream'i at
+                '-vn',
                 '-loglevel', 'error',
                 'pipe:1'
             ]);
@@ -65,10 +58,11 @@ module.exports = async (req, res) => {
 
         } else {
             // MP4 veya ffmpeg yoksa: yt-dlp → doğrudan response
+            // MP3 without ffmpeg: serve as best audio (m4a/webm)
             const q = quality || '720';
             const fmtStr = format === 'mp3'
                 ? 'bestaudio'
-                : `best[height<=${q}][ext=mp4]/best`;
+                : `best[height<=${q}][ext=mp4]/best[height<=${q}]/best`;
 
             const ytdlp = spawn(ytdlpPath, [...baseFlags, '-f', fmtStr, '-o', '-', url]);
             ytdlp.stdout.pipe(res);
