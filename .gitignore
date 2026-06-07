@@ -4,3 +4,6 @@ yt-dlp
 yt-dlp_macos
 .env
 *.log
+_local-server.js
+local-server.js
+server.js
