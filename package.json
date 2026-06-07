@@ -1,0 +1,15 @@
+{
+  "name": "yt-video-indir",
+  "version": "1.0.0",
+  "description": "YouTube Video and Audio Downloader",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "ffmpeg-static": "^5.2.0"
+  }
+}
