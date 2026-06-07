@@ -21,7 +21,7 @@ try {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname))); // root'tan serve et (Vercel ile uyumlu)
 
 // GET /api/info?url=...
 app.get('/api/info', async (req, res) => {
